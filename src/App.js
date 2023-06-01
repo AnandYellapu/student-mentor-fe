@@ -91,15 +91,6 @@ function App() {
     }
   };
 
-  // const handleShowStudentsForMentor = async (mentorId) => {
-  //   try {
-  //     const response = await axios.get(`${API_BASE_URL}/mentors/${mentorId}/students`);
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error('Failed to fetch students for mentor', error);
-  //   }
-  // };
-
   const handleShowStudentsForMentor = (mentorId) => {
     axios.get(`${API_BASE_URL}/mentors/${mentorId}/students`)
       .then((response) => {
@@ -110,18 +101,7 @@ function App() {
       });
   };
 
-
-  // const handleShowPreviousMentor = async (studentId) => {
-  //   try {
-  //     const response = await axios.get(`${API_BASE_URL}/students/${studentId}/previous-mentor`);
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error('Failed to fetch previous mentor for student', error);
-  //   }
-  // };
-
-
-   const handleShowPreviousMentor = (studentId) => {
+  const handleShowPreviousMentor = (studentId) => {
     axios.get(`${API_BASE_URL}/students/${studentId}/previous-mentor`)
       .then((response) => {
         setPreviousMentor(response.data);
@@ -132,90 +112,93 @@ function App() {
   };
 
   return (
-    <div>
-      <h2>Mentors</h2>
-      <button onClick={handleMentorCreate}>Create Mentor</button>
-      <ul>
-        {mentors.map((mentor) => (
-          <li key={mentor._id}>
-            {mentor.name}
-            <button onClick={() => handleShowStudentsForMentor(mentor._id)}>Show Students</button>
-          </li>
-        ))}
-      </ul>
+    <div className="container">
+  <h2>Mentors</h2>
+  <button onClick={handleMentorCreate}>Create Mentor</button>
+  <ul>
+    {mentors.map((mentor) => (
+      <li key={mentor._id}>
+        {mentor.name}
+        <button onClick={() => handleShowStudentsForMentor(mentor._id)}>Show Students</button>
+      </li>
+    ))}
+  </ul>
 
-      <h2>Students</h2>
-      <button onClick={handleStudentCreate}>Create Student</button>
-      <ul>
-        {students.map((student) => (
-          <li key={student._id}>
-            {student.name}
-            {!student.mentor && (
-              <select onChange={(e) => handleAssignMentor(student._id, e.target.value)}>
-                <option value="">Assign Mentor</option>
-                {mentors.map((mentor) => (
-                  <option key={mentor._id} value={mentor._id}>{mentor.name}</option>
-                ))}
-              </select>
-            )}
-            {student.mentor && (
-              <div>
-                Assigned Mentor: {student.mentor.name}
-                <button onClick={() => handleShowPreviousMentor(student._id)}>Show Previous Mentor</button>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+  <h2>Students</h2>
+  <button onClick={handleStudentCreate}>Create Student</button>
+  <ul>
+    {students.map((student) => (
+      <li key={student._id}>
+        {student.name}
+        {!student.mentor && (
+          <select onChange={(e) => handleAssignMentor(student._id, e.target.value)}>
+            <option value="">Assign Mentor</option>
+            {mentors.map((mentor) => (
+              <option key={mentor._id} value={mentor._id}>{mentor.name}</option>
+            ))}
+          </select>
+        )}
+        {student.mentor && (
+          <div>
+            Assigned Mentor: {student.mentor.name}
+            <button onClick={() => handleShowPreviousMentor(student._id)}>Show Previous Mentor</button>
+          </div>
+        )}
+      </li>
+    ))}
+  </ul>
 
-      <h2>Assign Mentor to Student</h2>
+  <h2>Assign Mentor to Student</h2>
+  <div className="assign-mentor">
+    <select value={selectedStudent} onChange={(e) => handleSelectStudent(e.target.value)}>
+      <option value="">Select Student</option>
+      {students.map((student) => (
+        <option key={student._id} value={student._id}>{student.name}</option>
+      ))}
+    </select>
+    <select value={selectedMentor} onChange={(e) => handleSelectMentor(e.target.value)}>
+      <option value="">Select Mentor</option>
+      {mentors.map((mentor) => (
+        <option key={mentor._id} value={mentor._id}>{mentor.name}</option>
+      ))}
+    </select>
+    <button onClick={handleAssignMentorToStudent}>Assign Mentor</button>
+    {assignedMentor && <div>Mentor assigned: {mentors.find((mentor) => mentor._id === assignedMentor)?.name}</div>}
+  </div>
+
+  <h2>Show Students for Mentor</h2>
+  <div className="show-students-for-mentor">
+    <select value={selectedMentor} onChange={(e) => setSelectedMentor(e.target.value)}>
+      <option value="">Select Mentor</option>
+      {mentors.map((mentor) => (
+        <option key={mentor._id} value={mentor._id}>{mentor.name}</option>
+      ))}
+    </select>
+    <button onClick={() => handleShowStudentsForMentor(selectedMentor)}>Show Students</button>
+    <ul>
+      {mentorStudents.map((student) => (
+        <li key={student._id}>{student.name}</li>
+      ))}
+    </ul>
+  </div>
+
+  <h2>Show Previous Mentor for Student</h2>
+  <div className="show-previous-mentor">
+    <select value={selectedStudent} onChange={(e) => setSelectedStudent(e.target.value)}>
+      <option value="">Select Student</option>
+      {students.map((student) => (
+        <option key={student._id} value={student._id}>{student.name}</option>
+      ))}
+    </select>
+    <button onClick={() => handleShowPreviousMentor(selectedStudent)}>Show Previous Mentor</button>
+    {previousMentor && (
       <div>
-        <select value={selectedStudent} onChange={(e) => handleSelectStudent(e.target.value)}>
-          <option value="">Select Student</option>
-          {students.map((student) => (
-            <option key={student._id} value={student._id}>{student.name}</option>
-          ))}
-        </select>
-        <select value={selectedMentor} onChange={(e) => handleSelectMentor(e.target.value)}>
-          <option value="">Select Mentor</option>
-          {mentors.map((mentor) => (
-            <option key={mentor._id} value={mentor._id}>{mentor.name}</option>
-          ))}
-        </select>
-        <button onClick={handleAssignMentorToStudent}>Assign Mentor</button>
-        {assignedMentor && <div>Mentor assigned: {mentors.find((mentor) => mentor._id === assignedMentor)?.name}</div>}
+        Previous Mentor: {previousMentor.name}
       </div>
+    )}
+  </div>
+</div>
 
-      <h2>Show Students for Mentor</h2>
-      <select value={selectedMentor} onChange={(e) => setSelectedMentor(e.target.value)}>
-        <option value="">Select Mentor</option>
-        {mentors.map((mentor) => (
-          <option key={mentor._id} value={mentor._id}>{mentor.name}</option>
-        ))}
-      </select>
-      <button onClick={() => handleShowStudentsForMentor(selectedMentor)}>Show Students</button>
-      <ul>
-        {mentorStudents.map((student) => (
-          <li key={student._id}>{student.name}</li>
-        ))}
-      </ul>
-            
-
-      <h2>Show Previous Mentor for Student</h2>
-      <select value={selectedStudent} onChange={(e) => setSelectedStudent(e.target.value)}>
-        <option value="">Select Student</option>
-        {students.map((student) => (
-          <option key={student._id} value={student._id}>{student.name}</option>
-        ))}
-      </select>
-      <button onClick={() => handleShowPreviousMentor(selectedStudent)}>Show Previous Mentor</button>
-      {previousMentor && (
-        <div>
-          Previous Mentor: {previousMentor.name}
-        </div>
-      )}
-
-    </div>
   );
 }
 
